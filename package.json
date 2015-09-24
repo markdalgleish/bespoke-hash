@@ -24,6 +24,8 @@
   },
   "devDependencies": {
     "bespoke": "^1.0.0",
+    "bespoke-classes": "^1.0.0",
+    "bespoke-keys": "^1.1.0",
     "browserify": "^4.1.5",
     "function-bind": "^0.1.0",
     "gulp": "^3.5.1",

@@ -1,0 +1,88 @@
+*, ::before, ::after {
+  -moz-box-sizing: inherit;
+       box-sizing: inherit;
+}
+
+html {
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1 {
+  margin: 0;
+}
+
+p {
+  margin: 0.25em 0;
+  font-size: 0.85em;
+}
+
+.deck {
+  font-family: Arial, sans-serif;
+  font-size: 2em;
+  line-height: 1.6;
+  color: #303030;
+  /* enable kerning using forward-compatible CSS */
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: "kern" 1;
+     -moz-font-feature-settings: "kern" 1;
+          font-feature-settings: "kern" 1;
+  -webkit-font-kerning: normal;
+     -moz-font-kerning: normal;
+          font-kerning: normal;
+}
+
+/* Hide deck and slide content until bespoke.js has added classes */
+.deck:not(.bespoke-parent),
+.deck section:not(.bespoke-slide) {
+  display: none;
+}
+
+.bespoke-parent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bespoke-slide {
+  /* force opacity to start at 0 to avoid transition on load when using bespoke-scale */
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 640px;
+  margin-left: -320px;
+  height: 360px;
+  margin-top: -180px;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+       -ms-flex-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+            -ms-flex-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+      -ms-flex-direction: column;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+  padding: 1em;
+  -webkit-transition: all 0.3s ease;
+          transition: all 0.3s ease;
+}
+
+.bespoke-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 1;
+}
