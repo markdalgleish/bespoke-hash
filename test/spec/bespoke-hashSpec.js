@@ -16,7 +16,7 @@ describe("bespoke-hash", function() {
     slides,
     deck;
 
-  var createDeck = function() {
+  var createDeck = function(opts) {
       slides = [];
 
       article = document.createElement(PARENT_TAG);
@@ -34,7 +34,7 @@ describe("bespoke-hash", function() {
       document.body.appendChild(article);
 
       deck = bespoke.from(PARENT_TAG, [
-        hash()
+        hash(opts)
       ]);
 
       // Wait for next tick
@@ -222,6 +222,58 @@ describe("bespoke-hash", function() {
 
     });
 
+  });
+
+  describe("given update mode is deactivated", function() {
+    beforeEach(function() {
+      window.location.hash = 2;
+    });
+
+    [true, false].forEach(function(historyOpt) {
+      describe("when the deck is created with history " + (historyOpt ? 'enabled' : 'disabled'), function() {
+        beforeEach(function() {
+          createDeck({ update: false, history: historyOpt });
+        });
+        afterEach(destroyDeck);
+
+        it("should activate the slide referenced in the hash", function() {
+          expect(deck.slide()).toBe(1);
+          expect(window.location.hash).toBe(historyOpt ? '#2' : '');
+        });
+
+        it("should not update the hash when the slide changes", function() {
+          deck.next();
+          expect(deck.slide()).toBe(2);
+          expect(window.location.hash).toBe(historyOpt ? '#2' : '');
+        });
+      });
+    });
+  });
+
+  describe("given history mode is deactivated", function() {
+    beforeEach(function() {
+      window.location.hash = 2;
+    });
+
+    describe("when the deck is created", function() {
+      beforeEach(function() {
+        createDeck({ history: false });
+      });
+      afterEach(destroyDeck);
+
+      it("should activate the slide referenced in the hash", function() {
+        expect(deck.slide()).toBe(1);
+        expect(window.location.hash).toBe('#2');
+      });
+
+      it("should not add entry to history when the slide changes", function() {
+        var beforeHistoryLength = window.history.length;
+        deck.next();
+        expect(deck.slide()).toBe(2);
+        expect(window.location.hash).toBe('#3');
+        expect(window.history.length).toBe(beforeHistoryLength);
+      });
+    });
   });
 
 });
