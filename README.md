@@ -50,6 +50,32 @@ If you'd like to use named hash routes instead, add `data-bespoke-hash` attribut
 </article>
 ```
 
+### Disabling updates
+
+You can prevent the URL from being updated after the initial page load by setting the `update` option to `false`. This switch allows you to respond to incoming changes from the URL, but not continue updating the URL when the slide changes.
+
+```
+bespoke.from('article', [
+  bespoke.plugins.hash({ update: false })
+]);
+```
+
+Default value: `true`
+
+### History control
+
+You can control whether this browser history is updated using the `history` option. A value of `false` overwrites the last history entry each time the slide is changed (assuming the `update` option is not `false`).
+
+```
+bespoke.from('article', [
+  bespoke.plugins.hash({ history: false })
+]);
+```
+
+If updates are disabled and the value of the `history` option is false, the hash will be removed from the URL after the deck is loaded.
+
+Default value: `true`
+
 ## Package managers
 
 ### npm
