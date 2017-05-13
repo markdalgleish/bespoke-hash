@@ -1,19 +1,15 @@
-var gulp = require('gulp'),
-  clean = require('gulp-clean'),
-  jshint = require('gulp-jshint'),
-  map = require('vinyl-map'),
-  istanbul = require('istanbul'),
-  karma = require('gulp-karma'),
-  coveralls = require('gulp-coveralls'),
-  header = require('gulp-header'),
-  rename = require('gulp-rename'),
-  uglify = require('gulp-uglify'),
-  pkg = require('./package.json'),
+var pkg = require('./package.json'),
   browserify = require('browserify'),
-  source = require('vinyl-source-stream'),
   buffer = require('vinyl-buffer'),
-  path = require('path'),
-  template = require('lodash').template;
+  coveralls = require('gulp-coveralls'),
+  del = require('del'),
+  gulp = require('gulp'),
+  header = require('gulp-header'),
+  jshint = require('gulp-jshint'),
+  karma = require('karma'),
+  rename = require('gulp-rename'),
+  source = require('vinyl-source-stream'),
+  uglify = require('gulp-uglify');
 
 gulp.task('default', ['clean', 'lint', 'test', 'compile']);
 gulp.task('dev', ['compile', 'lint', 'test', 'watch']);
@@ -24,8 +20,7 @@ gulp.task('watch', function() {
 });
 
 gulp.task('clean', function() {
-  return gulp.src(['dist', 'test/coverage'], { read: false })
-    .pipe(clean());
+  return del.sync(['dist', 'test/coverage']);
 });
 
 gulp.task('lint', function() {
@@ -34,19 +29,11 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('instrument', function() {
-  return gulp.src('lib/**/*.js')
-    .pipe(map(function(code, filename) {
-      var instrumenter = new istanbul.Instrumenter(),
-        relativePath = path.relative(__dirname, filename);
-      return instrumenter.instrumentSync(code.toString(), relativePath);
-    }))
-    .pipe(gulp.dest('lib-instrumented'));
-});
-
-gulp.task('test', ['clean', 'instrument'], function() {
-  return gulp.src(['test/spec/*Spec.js'])
-    .pipe(karma({ configFile: 'karma.conf.js' }));
+gulp.task('test', ['clean'], function(done) {
+  new karma.Server({ configFile: __dirname + '/karma.conf.js', singleRun: true })
+    // prevent karma from calling process.exit
+    .on('run_complete', function() { done(); })
+    .start();
 });
 
 gulp.task('coveralls', ['test'], function() {
@@ -55,11 +42,10 @@ gulp.task('coveralls', ['test'], function() {
 });
 
 gulp.task('compile', ['clean'], function() {
-  return browserify('./lib/bespoke-hash.js')
-    .bundle({ standalone: 'bespoke.plugins.hash' })
+  return browserify('lib/bespoke-hash.js', { standalone: 'bespoke.plugins.hash' }).bundle()
     .pipe(source('bespoke-hash.js'))
     .pipe(buffer())
-    .pipe(header(template([
+    .pipe(header([
       '/*!',
       ' * <%= name %> v<%= version %>',
       ' *',
@@ -67,14 +53,14 @@ gulp.task('compile', ['clean'], function() {
       ' * This content is released under the <%= licenses[0].type %> license',
       ' * <%= licenses[0].url %>',
       ' */\n\n'
-    ].join('\n'), pkg)))
+    ].join('\n'), pkg))
     .pipe(gulp.dest('dist'))
     .pipe(rename('bespoke-hash.min.js'))
     .pipe(uglify())
-    .pipe(header(template([
+    .pipe(header([
       '/*! <%= name %> v<%= version %> ',
       '© <%= new Date().getFullYear() %> <%= author.name %>, ',
       '<%= licenses[0].type %> License */\n'
-    ].join(''), pkg)))
+    ].join(''), pkg))
     .pipe(gulp.dest('dist'));
 });

@@ -1,7 +1,7 @@
 Function.prototype.bind = Function.prototype.bind || require('function-bind');
 
-var bespoke = require('bespoke');
-var hash = require('../../lib-instrumented/bespoke-hash.js');
+var bespoke = require('bespoke'),
+  hash = require('../../lib/bespoke-hash.js');
 
 describe("bespoke-hash", function() {
 
@@ -18,7 +18,7 @@ describe("bespoke-hash", function() {
     slides,
     deck;
 
-  var createDeck = function() {
+  var createDeck = function(done) {
       slides = [];
 
       article = document.createElement(PARENT_TAG);
@@ -43,7 +43,7 @@ describe("bespoke-hash", function() {
       ]);
 
       // Wait for next tick
-      waits(0);
+      setTimeout(function() { done(); }, 0);
     },
     destroyDeck = function() {
       document.body.removeChild(article);
@@ -213,14 +213,14 @@ describe("bespoke-hash", function() {
 
       var activeSlideN;
 
-      beforeEach(function() {
-        runs(function() {
-          activeSlideN = 5;
-          window.location.hash = activeSlideN;
-        });
+      beforeEach(function(done) {
+        activeSlideN = 5;
+        window.location.hash = activeSlideN;
 
         // Wait for next tick
-        waits(0);
+        setTimeout(function() {
+          done();
+        }, 0);
       });
 
       it("should activate the slide referenced in the hash", function() {
@@ -231,13 +231,13 @@ describe("bespoke-hash", function() {
 
     describe("when the hash changes to a slide name", function() {
 
-      beforeEach(function() {
-        runs(function() {
-          window.location.hash = FIRST_NAMED_SLIDE_NAME;
-        });
+      beforeEach(function(done) {
+        window.location.hash = FIRST_NAMED_SLIDE_NAME;
 
         // Wait for next tick
-        waits(0);
+        setTimeout(function() {
+          done();
+        }, 0);
       });
 
       it("should activate the slide referenced in the hash", function() {
