@@ -39,7 +39,7 @@ describe("bespoke-hash", function() {
       document.body.appendChild(article);
 
       deck = bespoke.from(PARENT_TAG, [
-        hash()
+        hash({ deferStart: true })
       ]);
 
       // Wait for next tick
